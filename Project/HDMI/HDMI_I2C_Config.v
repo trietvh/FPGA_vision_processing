@@ -5,8 +5,8 @@ module HDMI_I2C_Config #(
 	) 
 	(
 	// FPGA Side
-	input wire	refclk,
-	input wire	rst,
+	input wire	clk,
+	input wire  reset,
 	// I2C Side
 	output wire I2C_SCL,
 	output wire I2C_SDA,
@@ -27,9 +27,9 @@ module HDMI_I2C_Config #(
 	
 	
 	// I2C Control Clock //
-	always @(posedge refclk or negedge rst)
+	always @(posedge clk or negedge reset)
 	begin
-		if (!rst)
+		if (!reset)
 		begin
 			I2C_CTRL_CLK	<= 0;
 			I2C_CLK_DIV		<= 0;
@@ -47,8 +47,8 @@ module HDMI_I2C_Config #(
 	end
 	// I2C Controller //
 	HDMI_I2C_Controller u_HDMI_I2C_Controller (
-		.clk(refclk),
-		.reset(rst),
+		.clk(I2C_CTRL_CLK),
+		.reset(reset),
 		.I2C_DATA(I2C_DATA),
 		.enable(I2C_EN),
 		.I2C_SCL(I2C_SCL),
@@ -58,9 +58,9 @@ module HDMI_I2C_Config #(
 		);
 
 	//	Config Control //
-	always @(posedge refclk or negedge rst)
+	always @(posedge I2C_CTRL_CLK or negedge reset)
 	begin 
-		if (!rst)
+		if (!reset)
 		begin
 			LUT_INDEX	<= 0;
 			Setup_ST		<= 0;
@@ -82,10 +82,8 @@ module HDMI_I2C_Config #(
 							if (!I2C_ACK)
 								Setup_ST		<= 2;
 							else
-							begin
 								Setup_ST		<= 0;
-								I2C_EN		<= 0;
-							end
+							I2C_EN		<= 0;
 						end
 					end
 				2:	begin
