@@ -1,0 +1,10 @@
+
+Project/db/
+
+Project/incremental_db/
+
+Project/output_files/
+
+*.bak
+
+Project/c5_pin_model_dump.txt
