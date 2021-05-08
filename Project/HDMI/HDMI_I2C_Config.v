@@ -14,7 +14,7 @@ module HDMI_I2C_Config #(
 	);
 	
 	// Reg/Wire
-	reg		[7:0]		I2C_CLK_DIV;
+	reg		[7:0]	I2C_CLK_DIV;
 	reg		[23:0] 	I2C_DATA;
 	reg					I2C_CTRL_CLK;
 	reg 					I2C_EN;

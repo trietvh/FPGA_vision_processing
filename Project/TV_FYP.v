@@ -39,23 +39,37 @@ module TV_FYP (
 	//=======================================================
 
 	wire						hdmi_reset;
+	wire						hdmi_i2c_clk;
 	wire						hdmi_clk;
 
 	// HDMI Clock
 	HDMI_PLL u_hdmi_pll (
 		.refclk(CLOCK_50),
 		.rst(!KEY[0]),
-		.outclk_0(GPIO_0[10]),	// 24 MHz
-		.outclk_1(hdmi_clk),	// 1	MHz
+		.outclk_0(hdmi_clk),			// 24 MHz
+		.outclk_1(hdmi_i2c_clk),	// 1	MHz
 		.locked(hdmi_reset) 
 	);
 	
 	HDMI_I2C_Config u_HDMI_I2C_Config (
-		.refclk(hdmi_clk),
-		.rst(hdmi_reset),
+		.clk(hdmi_i2c_clk),
+		.reset(hdmi_reset),
 		.I2C_SCL(HDMI_I2C_SCL),
 		.I2C_SDA(HDMI_I2C_SDA),
 		.HDMI_TX_INT(HDMI_TX_INT)
+		);
+	
+	HDMI_VPG u_HDMI_VPG (
+		.clk(hdmi_clk),
+		.reset(hdmi_reset),
+		.SW(SW[1:0]),
+		.de(HDMI_TX_DE),
+		.hs(HDMI_TX_HS),
+		.vs(HDMI_TX_VS),
+		.pclk(HDMI_TX_CLK),
+		.vga_r(HDMI_TX_D[23:16]),
+		.vga_g(HDMI_TX_D[15:8]),
+		.vga_b(HDMI_TX_D[7:0])
 		);
 	
 	assign	LED[7] = hdmi_reset;
