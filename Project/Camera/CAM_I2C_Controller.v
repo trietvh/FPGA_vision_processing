@@ -1,4 +1,4 @@
-module HDMI_I2C_Controller (
+module CAM_I2C_Controller (
 	input				clk,
 	input [23:0] 	I2C_DATA,
 	input 			enable,
@@ -14,7 +14,7 @@ module HDMI_I2C_Controller (
 	assign I2C_SDA = SDAO ? 1'bz : 1'b0;
 	assign I2C_SCL = SCLO ? 1'bz : 1'b0;
 	
-	I2C_WRITE_DATA HDMI_I2C_WRITE_DATA (
+	I2C_WRITE_DATA CAM_I2C_WRITE_DATA (
 		.clk(clk),
 		.reset(reset),
 		.SCL(SCLO),

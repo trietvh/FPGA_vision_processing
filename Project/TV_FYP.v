@@ -1,3 +1,8 @@
+// Final Year Project
+// FPGA Vision Processing
+// Student: 	Triet Hoang Vo
+// Supervisor: Lindsay Kleeman
+
 module TV_FYP (
 	///////////// CLOCK /////////////
 	input 					CLOCK_50,
@@ -38,30 +43,38 @@ module TV_FYP (
 	//  REG/WIRE declarations
 	//=======================================================
 
-	wire						hdmi_reset;
-	wire						hdmi_i2c_clk;
+	wire						reset_n;
+	wire						i2c_clk;
 	wire						hdmi_clk;
+	wire						CAM_SCL;
+	wire						CAM_SDA;
+	
+	assign GPIO_0[25] = CAM_SCL;
+	assign GPIO_0[24] = CAM_SDA;
+//	assign GPIO_0[22] = hdmi_clk;
 
-	// HDMI Clock
+	//  Clock
 	HDMI_PLL u_hdmi_pll (
 		.refclk(CLOCK_50),
 		.rst(!KEY[0]),
 		.outclk_0(hdmi_clk),			// 24 MHz
-		.outclk_1(hdmi_i2c_clk),	// 1	MHz
-		.locked(hdmi_reset) 
+		.outclk_1(i2c_clk),			// 1	MHz
+		.locked(reset_n) 
 	);
 	
+	// HDMI I2C Config
 	HDMI_I2C_Config u_HDMI_I2C_Config (
-		.clk(hdmi_i2c_clk),
-		.reset(hdmi_reset),
+		.clk(i2c_clk),
+		.reset(reset_n),
 		.I2C_SCL(HDMI_I2C_SCL),
 		.I2C_SDA(HDMI_I2C_SDA),
 		.HDMI_TX_INT(HDMI_TX_INT)
 		);
 	
+	// HDMI Pattern Generator
 	HDMI_VPG u_HDMI_VPG (
 		.clk(hdmi_clk),
-		.reset(hdmi_reset),
+		.reset(reset_n),
 		.SW(SW[1:0]),
 		.de(HDMI_TX_DE),
 		.hs(HDMI_TX_HS),
@@ -72,7 +85,16 @@ module TV_FYP (
 		.vga_b(HDMI_TX_D[7:0])
 		);
 	
-	assign	LED[7] = hdmi_reset;
+	// Camera I2C 
+	CAM_I2C_Config u_CAM_I2C_Config (
+		.clk(i2c_clk),
+		.reset(reset_n),
+		.I2C_SCL(CAM_SCL),
+		.I2C_SDA(CAM_SDA)
+		);
+	
+	
+	assign	LED[7] = reset_n;
 
 
 
