@@ -48,10 +48,30 @@ module TV_FYP (
 	wire						hdmi_clk;
 	wire						CAM_SCL;
 	wire						CAM_SDA;
-	
-	assign GPIO_0[25] = CAM_SCL;
-	assign GPIO_0[24] = CAM_SDA;
-//	assign GPIO_0[22] = hdmi_clk;
+	wire						CAM_VS;
+	wire						CAM_HS;
+	wire 						CAM_XLK;
+	wire 						CAM_PLK;
+	wire 		[7:0]			CAM_D;
+
+	// Assign Camera Pins
+	assign GPIO_0[24] = CAM_SCL;
+	assign GPIO_0[25] = CAM_SDA;
+	assign GPIO_0[22] = CAM_HS;
+	assign GPIO_0[23] = CAM_VS;
+	assign GPIO_0[20] = CAM_PLK;
+	assign GPIO_0[21] = CAM_XLK;
+	assign GPIO_0[10] = CAM_RST;
+	assign GPIO_0[11] = CAM_PWD;
+	// Camera Data
+	assign GPIO_0[18] = CAM_D[7];
+	assign GPIO_0[19] = CAM_D[6];
+	assign GPIO_0[16] = CAM_D[5];
+	assign GPIO_0[17] = CAM_D[4];
+	assign GPIO_0[14] = CAM_D[3];
+	assign GPIO_0[15] = CAM_D[2];
+	assign GPIO_0[12] = CAM_D[1];
+	assign GPIO_0[13] = CAM_D[0];
 
 	//  Clock
 	HDMI_PLL u_hdmi_pll (
