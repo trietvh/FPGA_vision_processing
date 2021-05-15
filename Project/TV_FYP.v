@@ -52,6 +52,8 @@ module TV_FYP (
 	wire						CAM_HS;
 	wire 						CAM_XLK;
 	wire 						CAM_PLK;
+	wire						CAM_RST;
+	wire						CAM_PWD;
 	wire 		[7:0]			CAM_D;
 
 	// Assign Camera Pins

@@ -17,12 +17,20 @@ module I2C_WRITE_DATA (
 	reg [7:0] CNT;
 	reg [7:0] ST;
 	reg [7:0] BYTE;
+	reg [15:0] CNT_DWN;
 	
-	
+	localparam CLK_FRQ = 20000;
+	localparam DLY_FRQ = 2;
+
 	always @(posedge clk or negedge reset)
 	begin
 		if (!reset)
-			ST 	<= 0;
+		begin
+			ST 		<= 0;
+			CNT_DWN 	<= 0;
+		end
+		else if (REG_DATA == 16'hFF_F0)
+			ST <= 22;
 		else
 			case (ST)
 				0: begin
@@ -100,12 +108,21 @@ module I2C_WRITE_DATA (
 						BYTE	<= 0;
 					end
 				30: begin
-					if (!enable) ST <= 31;
+						if (!enable) ST <= 31;
 					end
 				31: begin
-					END <= 0;
-					ACK <= 0;
-					ST <= 1;
+						END <= 0;
+						ACK <= 0;
+						ST <= 1;
+					end
+				22: begin
+						if (CNT_DWN < (CLK_FRQ/DLY_FRQ) )
+							CNT_DWN <= CNT_DWN + 1;
+						else 
+						begin
+							CNT_DWN <= 0;
+							ST <= 9;
+						end
 					end
 			endcase
 	end

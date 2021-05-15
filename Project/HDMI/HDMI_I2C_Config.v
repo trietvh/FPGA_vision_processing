@@ -1,9 +1,4 @@
-module HDMI_I2C_Config #(
-	parameter CLK_ref = 1000000,
-	parameter I2C_clk = 20000,
-	parameter LUT_SIZE = 31
-	) 
-	(
+module HDMI_I2C_Config (
 	// FPGA Side
 	input wire	clk,
 	input wire  reset,
@@ -21,11 +16,13 @@ module HDMI_I2C_Config #(
 	wire					I2C_END;
 	wire					I2C_ACK;
 	reg		[15:0]	LUT_DATA;
-	reg		[4:0]		LUT_INDEX;
+	reg		[5:0]		LUT_INDEX;
 	reg 		[1:0]		Setup_ST;
 	
 	
-	
+	localparam CLK_ref = 1000000;
+	localparam I2C_clk = 20000;
+	localparam LUT_SIZE = 31;
 	// I2C Control Clock //
 	always @(posedge clk or negedge reset)
 	begin
@@ -110,7 +107,7 @@ module HDMI_I2C_Config #(
 				1	:	LUT_DATA	<=	16'h0100;  //Set 'N' value at 6144
 				2	:	LUT_DATA	<=	16'h0218;  //Set 'N' value at 6144
 				3	:	LUT_DATA	<=	16'h0300;  //Set 'N' value at 6144
-				4	:	LUT_DATA	<=	16'h1470;  // Set Ch count in the channel status to 8.
+				4	:	LUT_DATA	<=	16'h1470;  //Set Ch count in the channel status to 8.
 				5	:	LUT_DATA	<=	16'h1520;  //Input 444 (RGB or YCrCb) with Separate Syncs, 48kHz fs
 				6	:	LUT_DATA	<=	16'h1630;  //Output format 444, 24-bit input
 				7	:	LUT_DATA	<=	16'h1846;  //Disable CSC
@@ -122,7 +119,7 @@ module HDMI_I2C_Config #(
 				13	:	LUT_DATA	<=	16'h96F6;  //Set interrup
 				14	:	LUT_DATA	<=	16'h7307;  //Info frame Ch count to 8
 				15	:	LUT_DATA	<=	16'h761f;  //Set speaker allocation for 8 channels
-				16	:	LUT_DATA	<=	16'h9803;  //Must be set to 0x03 for proper operation
+				16	:	LUT_DATA	<=	16'hFFF0;  //Must be set to 0x03 for proper operation
 				17	:	LUT_DATA	<=	16'h9902;  //Must be set to Default Value
 				18	:	LUT_DATA	<=	16'h9ae0;  //Must be set to 0b1110000
 				19	:	LUT_DATA	<=	16'h9c30;  //PLL filter R1 value
@@ -137,7 +134,7 @@ module HDMI_I2C_Config #(
 				28	:	LUT_DATA	<=	16'hde10;  //Must be set to Default for proper operation
 				29	:	LUT_DATA	<=	16'he460;  //Must be set to Default Value
 				30	:	LUT_DATA	<=	16'hfa7d;  //Nbr of times to look for good phase
-				default:		LUT_DATA	<=	16'h9803;
+				default:LUT_DATA	<=	16'h9803;
 			endcase
 		end
 endmodule

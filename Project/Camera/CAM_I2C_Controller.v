@@ -17,6 +17,7 @@ module CAM_I2C_Controller (
 	I2C_WRITE_DATA CAM_I2C_WRITE_DATA (
 		.clk(clk),
 		.reset(reset),
+		.enable(enable),
 		.SCL(SCLO),
 		.SDA(SDAO),
 		.SDAI(I2C_SDA),
