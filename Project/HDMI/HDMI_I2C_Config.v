@@ -103,7 +103,7 @@ module HDMI_I2C_Config (
 	always
 		begin
 			case(LUT_INDEX)
-				0	:	LUT_DATA	<=	16'h9803;  //Must be set to 0x03 for proper operation
+				0	:	LUT_DATA	<=	16'hFFFF;  //Must be set to 0x03 for proper operation
 				1	:	LUT_DATA	<=	16'h0100;  //Set 'N' value at 6144
 				2	:	LUT_DATA	<=	16'h0218;  //Set 'N' value at 6144
 				3	:	LUT_DATA	<=	16'h0300;  //Set 'N' value at 6144
@@ -119,7 +119,7 @@ module HDMI_I2C_Config (
 				13	:	LUT_DATA	<=	16'h96F6;  //Set interrup
 				14	:	LUT_DATA	<=	16'h7307;  //Info frame Ch count to 8
 				15	:	LUT_DATA	<=	16'h761f;  //Set speaker allocation for 8 channels
-				16	:	LUT_DATA	<=	16'hFFF0;  //Must be set to 0x03 for proper operation
+				16	:	LUT_DATA	<=	16'h9803;  //Must be set to 0x03 for proper operation
 				17	:	LUT_DATA	<=	16'h9902;  //Must be set to Default Value
 				18	:	LUT_DATA	<=	16'h9ae0;  //Must be set to 0b1110000
 				19	:	LUT_DATA	<=	16'h9c30;  //PLL filter R1 value

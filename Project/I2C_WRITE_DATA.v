@@ -17,10 +17,9 @@ module I2C_WRITE_DATA (
 	reg [7:0] CNT;
 	reg [7:0] ST;
 	reg [7:0] BYTE;
-	reg [15:0] CNT_DWN;
+	reg [7:0] CNT_DWN;
 	
-	localparam CLK_FRQ = 20000;
-	localparam DLY_FRQ = 2;
+	localparam DLY = 200; // Delay 200 I2C Clock cycles (10 ms)
 
 	always @(posedge clk or negedge reset)
 	begin
@@ -29,8 +28,6 @@ module I2C_WRITE_DATA (
 			ST 		<= 0;
 			CNT_DWN 	<= 0;
 		end
-		else if (REG_DATA == 16'hFF_F0)
-			ST <= 22;
 		else
 			case (ST)
 				0: begin
@@ -43,9 +40,13 @@ module I2C_WRITE_DATA (
 						if (enable) ST	<= 30;
 					end
 				1: begin
-						ST		<= 2;
-						{SDA, SCL}	<= 2'b01;
-						Temp	<= {SL_ADDR, 1'b1};
+						if (REG_DATA == 16'hFFFF) ST <= 22;
+						else
+						begin
+							ST		<= 2;
+							{SDA, SCL}	<= 2'b01;
+							Temp	<= {SL_ADDR, 1'b1};
+						end
 					end
 				2: begin
 						ST		<= 3;
@@ -69,7 +70,6 @@ module I2C_WRITE_DATA (
 							begin
 								CNT 	<= 0;
 								ST		<= 2;
-								
 								if ( BYTE == 0 )
 								begin
 									BYTE	<= 1;
@@ -80,7 +80,6 @@ module I2C_WRITE_DATA (
 									BYTE	<= 2;
 									Temp	<= {REG_DATA[7:0], 1'b1};
 								end
-								
 							end
 							
 							if (SDAI) ACK	<= 1;
@@ -116,7 +115,7 @@ module I2C_WRITE_DATA (
 						ST <= 1;
 					end
 				22: begin
-						if (CNT_DWN < (CLK_FRQ/DLY_FRQ) )
+						if (CNT_DWN < DLY)
 							CNT_DWN <= CNT_DWN + 1;
 						else 
 						begin

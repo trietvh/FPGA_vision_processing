@@ -14,6 +14,7 @@ module HDMI_VPG #(
 	input							clk,
 	input	 						reset,
 	input				[1:0] 	SW,
+	input				[7:0]		CAM_DTA,
 	output						pclk,
 	output	reg				de,
 	output	reg				hs,
@@ -42,6 +43,29 @@ module HDMI_VPG #(
 	assign vr_start = v_count == v_start; 
 	assign vr_end = v_count == v_end;
 	assign pclk = clk;
+	/*
+	// Generate o_pclk = i_pclk/2
+	reg [1:0] counter;
+	always@(posedge clk or negedge reset)
+	begin
+		if (!reset)
+		begin
+			counter <= 2'b0;
+			pclk <= 1'b0;				//frequency divider
+		end
+		else
+		begin
+			if (counter < 1)
+				counter <= counter + 1;
+			else
+			begin
+				counter <= 0;
+				pclk <= ~pclk;
+			end
+		end
+	end
+	*/
+	
 	// Horizontal Control Signals
 	always @(posedge clk or negedge reset) 
 	begin
@@ -112,18 +136,39 @@ module HDMI_VPG #(
 	reg [11:0] width; 
 	reg [11:0] len;
 	
+	reg full_pixel;
+	reg [2:0] t_vga_g;
+	reg [4:0] t_vga_r;
+	
 	always @(posedge clk or negedge reset)
 	begin
-		 if (!reset)
-		 begin 
+		if (!reset)
+		begin 
 				de <= 1'b0;
-			  pre_vga_de  <= 1'b0;
-		 end
-		 else
-		 begin
-			  de     <= pre_vga_de;
-			  pre_vga_de <= v_act && h_act;
-			  
+				pre_vga_de  <= 1'b0;
+				full_pixel <= 1'b0;
+		end
+		else
+		begin
+			de     <= pre_vga_de;
+			pre_vga_de <= v_act && h_act;
+			
+			if (full_pixel)
+			begin
+				vga_r <= {t_vga_r, 3'b0};
+				vga_b <= {CAM_DTA[4:0], 3'b0};
+				vga_g <= {1'b0, t_vga_g, CAM_DTA[7:5], 2'b0};
+				full_pixel <= ~full_pixel;
+			end
+			else
+			begin
+				t_vga_r <= CAM_DTA[7:3];
+				t_vga_g <= CAM_DTA[2:0];
+				full_pixel <= ~full_pixel;
+			end
+		end
+			
+/*	  
 			  case (SW[0])
 					1'b0 : width <= `width1;
 					1'b1 : width <= `width2;
@@ -146,8 +191,9 @@ module HDMI_VPG #(
 					{vga_r, vga_g, vga_b} <= {8'h00, 8'hFF, 8'hFF};
 			  else
 					{vga_r, vga_g, vga_b} <= {8'h00, 8'h00, 8'h00};
-
-		 end
+		end
+*/		
+		
+		
 	end
-	
 endmodule
