@@ -1,0 +1,126 @@
+m255
+K4
+z2
+!s11f MIXED_VERSIONS
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/FYP/FPGA_vision_processing/Project/buffer/testbench
+vDTA_Buffer
+!s110 1630474545
+!i10b 1
+!s100 SB@DANjZJzm2iHmABKg690
+Z1 !s11b Dg1SIo80bB@j0V0VzS_@n1
+IZCdF4laPLd@XCF:gjKWU]1
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+R0
+w1630474243
+8../DTA_Buffer.v
+F../DTA_Buffer.v
+!i122 8
+L0 3 24
+Z3 OV;L;2020.1;71
+r1
+!s85 0
+31
+!s108 1630474545.000000
+!s107 ../DTA_Buffer.v|../RAM_DTA_Capture.v|
+!s90 -reportprogress|300|../RAM_DTA_Capture.v|../DTA_Buffer.v|
+!i113 1
+Z4 tCvgOpt 0
+n@d@t@a_@buffer
+vDTA_Buffer_tb
+!s110 1630484024
+!i10b 1
+!s100 nEFbUXM3f9Z53<P:;EnhX0
+R1
+Im3E34=UE[SRzKPJ;4BI^J2
+R2
+R0
+w1630476303
+8RGB_DTA_Buffer_tb.v
+FRGB_DTA_Buffer_tb.v
+!i122 13
+L0 3 43
+R3
+r1
+!s85 0
+31
+!s108 1630484024.000000
+!s107 RGB_DTA_Buffer_tb.v|
+!s90 -reportprogress|300|RGB_DTA_Buffer_tb.v|
+!i113 1
+R4
+n@d@t@a_@buffer_tb
+vRAM_DTA_Capture
+Z5 !s110 1630484688
+!i10b 1
+!s100 S;Hmhcgg8zD6F2DjnhEk?1
+R1
+I6VGSLfGBA]Jf?@PYP0>n>0
+R2
+R0
+w1629900727
+8../RAM_DTA_Capture.v
+F../RAM_DTA_Capture.v
+!i122 23
+L0 40 74
+R3
+r1
+!s85 0
+31
+Z6 !s108 1630484688.000000
+!s107 ../RAM_DTA_Capture.v|
+!s90 -reportprogress|300|../RAM_DTA_Capture.v|
+!i113 1
+R4
+n@r@a@m_@d@t@a_@capture
+vRAM_DTA_Capture_tb
+R5
+!i10b 1
+!s100 L<UT5]<>c`N<7Ik4OZ^;=1
+R1
+IZe=hz1PeYkWoXz]`d`R@Y3
+R2
+R0
+w1630484685
+8RAM_DTA_Capture_tb.v
+FRAM_DTA_Capture_tb.v
+!i122 24
+L0 3 51
+R3
+r1
+!s85 0
+31
+R6
+!s107 RAM_DTA_Capture_tb.v|
+!s90 -reportprogress|300|RAM_DTA_Capture_tb.v|
+!i113 1
+R4
+n@r@a@m_@d@t@a_@capture_tb
+vRGB_DTA_Buffer
+!s110 1630483861
+!i10b 1
+!s100 0EP[DWoP1Zhj^6R3hY`371
+R1
+IWDSlE7RDPRULGC_YCh9M?2
+R2
+R0
+w1630483553
+8../RGB_DTA_Buffer.v
+F../RGB_DTA_Buffer.v
+!i122 10
+L0 3 30
+R3
+r1
+!s85 0
+31
+!s108 1630483861.000000
+!s107 ../RGB_DTA_Buffer.v|../RAM_DTA_Capture.v|
+!s90 -reportprogress|300|../RAM_DTA_Capture.v|../RGB_DTA_Buffer.v|
+!i113 1
+R4
+n@r@g@b_@d@t@a_@buffer

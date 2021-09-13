@@ -47,7 +47,7 @@ module TV_FYP (
 	wire						CAM_SCL;
 	wire						CAM_SDA;
 	wire						CAM_VS;
-	wire						CAM_HR;
+	wire						CAM_HS;
 	wire 						CAM_XLK;
 	wire 						CAM_PLK;
 	wire						CAM_RST;
@@ -55,8 +55,8 @@ module TV_FYP (
 	wire 		[7:0]			CAM_DTA;
 
 	// Assign Camera Pins
-	assign CAM_HS 	= GPIO_0[22];
-	assign CAM_VS 	= GPIO_0[23];
+	assign CAM_HS 	= GPIO_0[23];
+	assign CAM_VS 	= GPIO_0[22];
 	assign CAM_PLK = GPIO_0[20];
 	assign CAM_PWD = 1'b0;
 	assign CAM_RST = 1'b1;
@@ -105,59 +105,57 @@ module TV_FYP (
 		.I2C_SDA(CAM_SDA)
 		);	
 
-	wire [15:0] P_DTA;
-	reg o_pclk;
-	wire en;
-/*
-	// Camera data capture
-	CAM_DTA_Capture u_CAM_DTA_Capture (
-		.i_pclk(CAM_PLK),
-		.reset(reset_n),
-		.CAM_DTA(CAM_DTA),
-		.href(CAM_HR),
-		.vsync(CAM_VS),
-		.pixel(P_DTA),
-		.o_pclk(o_pclk),
-		.en(en)
-		);
-*/
-
-/*
-	// Video Generator
-	HDMI_VPG_V2 u_HDMI_VPG_V2 (
-		.clk(o_pclk),
-		.reset(reset_n),
-		.P_DTA(P_DTA),
-		.href(CAM_HR),
-		.vsync(CAM_VS),
-		.en(en),
-		.de(HDMI_TX_DE),
-		.hs(HDMI_TX_HS),
-		.vs(HDMI_TX_VS),
-		.pclk(HDMI_TX_CLK),
-		.vga_r(HDMI_TX_D[23:16]),
-		.vga_g(HDMI_TX_D[15:8]),
-		.vga_b(HDMI_TX_D[7:0])
-		);
-*/	
 	
-
 	// HDMI Pattern Generator
+	HDMI_RGB_VPG HDMI_u (
+        .clk(CAM_XLK),
+        .reset_n(reset_n),
+        .PIXEL(),
+        .buffer_rd(),
+        // Output
+        .pclk(HDMI_TX_CLK),
+        .hs(HDMI_TX_HS),
+        .vs(HDMI_TX_VS),
+        .de(HDMI_TX_DE),
+        .vga_r(HDMI_TX_D[23:16]),
+        .vga_g(HDMI_TX_D[15:8]),
+        .vga_b(HDMI_TX_D[7:0])
+    );
+	
+	
+	assign GPIO_1[0] = HDMI_TX_HS;
+	assign GPIO_1[1] = HDMI_TX_VS;
+	assign GPIO_1[2] = HDMI_TX_DE;
+	assign GPIO_1[3] = HDMI_TX_CLK;
+
+	
+/*
+	wire o_pclk;
+	reg out_pclk;
+
+	assign o_pclk = out_pclk;
+	always@(negedge CAM_PLK)
+	begin
+		if (!reset_n)   out_pclk <= 1'b0;				
+		else            out_pclk <= ~out_pclk;
+	end
+	
 	HDMI_VPG u_HDMI_VPG (
 		.clk(CAM_PLK),
-		.reset(reset_n),
+		.reset_n(reset_n),
 		.SW(SW[1:0]),
+		.CAM_HR(CAM_HS),
+		.CAM_VS(CAM_VS),
 		.CAM_DTA(CAM_DTA),
 		.de(HDMI_TX_DE),
-		.hs(HDMI_TX_HS),
-		.vs(HDMI_TX_VS),
+		.hr(HDMI_TX_HS),
+		.vr(HDMI_TX_VS),
 		.pclk(HDMI_TX_CLK),
 		.vga_r(HDMI_TX_D[23:16]),
 		.vga_g(HDMI_TX_D[15:8]),
 		.vga_b(HDMI_TX_D[7:0])
 		);
-		
-
+*/
 /*
 	// Create clock 2 Hz
 	localparam delay = 100000;

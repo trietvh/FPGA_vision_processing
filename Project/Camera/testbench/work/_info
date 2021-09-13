@@ -1,0 +1,79 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/FYP/FPGA_vision_processing/Project/camera/testbench
+vCAM_RGB_Capture
+Z1 !s110 1630476922
+!i10b 1
+!s100 f;GX]TmYb`kfZTPY@g=j<1
+Z2 !s11b Dg1SIo80bB@j0V0VzS_@n1
+I^afZ_BPmK3XdnafD65Sg:0
+Z3 VDg1SIo80bB@j0V0VzS_@n1
+Z4 dC:/FYP/FPGA_vision_processing/Project/Camera/testbench
+w1630476916
+8../CAM_RGB_Capture.v
+F../CAM_RGB_Capture.v
+!i122 111
+L0 1 74
+Z5 OV;L;2020.1;71
+r1
+!s85 0
+31
+Z6 !s108 1630476922.000000
+!s107 ../CAM_RGB_Capture.v|
+!s90 -reportprogress|300|../CAM_RGB_Capture.v|
+!i113 1
+Z7 tCvgOpt 0
+n@c@a@m_@r@g@b_@capture
+vCAM_RGB_Capture_tb
+!s110 1630385601
+!i10b 1
+!s100 [:1kAX5FcgZl^mFWT;Pk>0
+R2
+InRiL75?XSm>C2;m<5VR@:3
+R3
+R0
+w1630385592
+Z8 8CAM_RGB_Capture_tb.v
+Z9 FCAM_RGB_Capture_tb.v
+!i122 7
+L0 3 38
+R5
+r1
+!s85 0
+31
+!s108 1630385601.000000
+!s107 CAM_RGB_Capture_tb.v|
+Z10 !s90 -reportprogress|300|CAM_RGB_Capture_tb.v|
+!i113 1
+R7
+n@c@a@m_@r@g@b_@capture_tb
+vtestbench
+R1
+!i10b 1
+!s100 ]TAYCK?Y;RHF7??R1_:UE3
+R2
+I2E`m^@2j<zZbE:cQLU8=X0
+R3
+R4
+w1630395435
+R8
+R9
+!i122 112
+L0 3 43
+R5
+r1
+!s85 0
+31
+R6
+Z11 !s107 CAM_RGB_Capture_tb.v|
+R10
+!i113 1
+R7

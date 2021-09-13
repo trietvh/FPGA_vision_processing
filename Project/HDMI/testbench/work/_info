@@ -1,0 +1,57 @@
+m255
+K4
+z2
+!s11f vlog 2020.1 2020.02, Feb 28 2020
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/FYP/FPGA_vision_processing/project/hDMI/testbench
+vHDMI_RGB_VPG
+Z0 !s110 1630471026
+!i10b 1
+!s100 7P^VB;iCHh=zPVSgkcJ]i0
+Z1 !s11b Dg1SIo80bB@j0V0VzS_@n1
+ILckj1W3n05LTE8>47m2oQ0
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+Z3 dC:/FYP/FPGA_vision_processing/Project/HDMI/Testbench
+w1630470967
+8../HDMI_RGB_VPG.v
+F../HDMI_RGB_VPG.v
+!i122 65
+L0 1 132
+Z4 OV;L;2020.1;71
+r1
+!s85 0
+31
+Z5 !s108 1630471026.000000
+!s107 ../HDMI_RGB_VPG.v|
+!s90 -reportprogress|300|../HDMI_RGB_VPG.v|
+!i113 1
+Z6 tCvgOpt 0
+n@h@d@m@i_@r@g@b_@v@p@g
+vHDMI_RGB_VPG_tb
+R0
+!i10b 1
+!s100 jHz;lUJb<JSb4em6`_N;f3
+R1
+IH6O4MG3N760>U`T1;7ZcC3
+R2
+R3
+w1630469906
+8HDMI_RGB_VPG_tb.v
+FHDMI_RGB_VPG_tb.v
+!i122 66
+L0 3 43
+R4
+r1
+!s85 0
+31
+R5
+!s107 HDMI_RGB_VPG_tb.v|
+!s90 -reportprogress|300|HDMI_RGB_VPG_tb.v|
+!i113 1
+R6
+n@h@d@m@i_@r@g@b_@v@p@g_tb
