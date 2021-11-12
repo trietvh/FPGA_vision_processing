@@ -16,3 +16,23 @@ Project/TV_FYP.qws
 Project/testbench/CAM_RAM_HDMI/work/
 
 *.wlf
+
+Project/testbench/
+
+Project/Buffer/greybox_tmp/
+
+Project/greybox_tmp/
+
+Project/TV_FYP.restore.rpt
+
+Project/simulation/
+
+*.qdf
+
+*.qpf
+
+*.qsf
+
+Project/qar_info.json
+
+*.rpt
