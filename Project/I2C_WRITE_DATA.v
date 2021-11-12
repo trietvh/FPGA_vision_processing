@@ -59,7 +59,7 @@ module I2C_WRITE_DATA (
 				4: begin
 						ST 	<= 5;
 						SCL	<= 1'b1;
-						CNT	<= CNT + 1;
+						CNT	<= CNT + 8'd1;
 					end
 				5: begin
 						SCL <= 1'b0;
@@ -116,7 +116,7 @@ module I2C_WRITE_DATA (
 					end
 				22: begin
 						if (CNT_DWN < DLY)
-							CNT_DWN <= CNT_DWN + 1;
+							CNT_DWN <= CNT_DWN + 8'd1;
 						else 
 						begin
 							CNT_DWN <= 0;

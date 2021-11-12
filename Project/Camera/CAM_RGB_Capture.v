@@ -1,22 +1,22 @@
 module CAM_RGB_Capture (
 	// Input
-	input									i_pclk,
+	input							i_pclk,
 	input 				[7:0] 		CAM_RGB,
-	input									HREF,
-	input									VSYNC,
+	input							HREF,
+	input							VSYNC,
 	// Output
-	output	reg		[15:0] 		PIXEL,
+	output	reg						HDMI_En,
+	output	reg			[15:0] 		PIXEL,
 	output	reg						o_pclk,
 	output	reg						en = 1'b0
 	);
 	
-	localparam WAIT_FRAME = 0;
-	localparam FRAME_START = 1;
+	localparam WAIT_FRAME = 1'b0;
+	localparam FRAME_START = 1'b1;
 	reg STATE = 1'b0;
 	reg frame_done;
 	reg half_pixel;
 	reg clk_STATE = 1'b0;
-
 
 	// Generate an output clk = input clk / 2		
 	always@(negedge i_pclk)
@@ -26,13 +26,15 @@ module CAM_RGB_Capture (
 		// Using VSYNC to synchronize o_pclk
 			clk_STATE <= VSYNC ? FRAME_START : WAIT_FRAME; 
 			o_pclk <= 1'b0;
+			HDMI_En <= 1'b0;
 		end
-		FRAME_START: o_pclk <= ~o_pclk;
+		FRAME_START:
+		begin
+			o_pclk <= ~o_pclk;
+			HDMI_En <= 1'b1;
+		end
 		endcase
-				
-    	
-
-
+		
 	always @(posedge i_pclk)
 		case (STATE)
 		WAIT_FRAME:	
@@ -67,8 +69,6 @@ module CAM_RGB_Capture (
 				en <= 1'b0;
 			end
 		end
-		
 		endcase
-
 endmodule
 	

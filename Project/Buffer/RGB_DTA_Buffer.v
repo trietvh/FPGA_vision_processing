@@ -4,21 +4,21 @@ module RGB_DTA_Buffer(
     input                   i_clk,
     input                   CAM_En,
     input       [15:0]      CAM_DTA,
-    input       [10:0]      RD_ADDR,
+    input       [12:0]      RD_ADDR,
     // Output
-    output                  HDMI_En,
-    output      [15:0]      HDMI_DTA
+    output      [15:0]      HDMI_DTA,
+    output                  BUF_FILLED
 );
-    reg [10:0] WR_ADDR = 11'd0;
-    assign HDMI_En = WR_ADDR == 13'd1;
-
+    reg [12:0] WR_ADDR = 13'd0;
+    
+    assign BUF_FILLED = WR_ADDR == 13'd1;
 
     always @(posedge i_clk) begin
         if (CAM_En)
-            if (WR_ADDR < 11'd1279)
-                WR_ADDR <= WR_ADDR + 11'd1;
+            if (WR_ADDR < 13'd1279)
+                WR_ADDR <= WR_ADDR + 13'd1;
             else
-                WR_ADDR <= 11'd0;
+                WR_ADDR <= 13'd0;
     end
 
     RAM_DTA_Capture	u_RAM_DTA_Capture (

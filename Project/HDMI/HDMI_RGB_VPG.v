@@ -1,11 +1,11 @@
 module HDMI_RGB_VPG (
 	// Input
 	input								clk,
-	input								BUFFER_EN,
-	input					[15:0]	PIXEL,
+	input								HDMI_EN,
+	input					[15:0]		PIXEL,
+	input					[1:0]		SLO,
 	// Output
-	output	reg		[12:0]	RD_ADDR,
-	output							pclk,
+	output						pclk,
 	output	reg					hs,
 	output	reg					vs,
 	output	reg					de,
@@ -17,24 +17,23 @@ module HDMI_RGB_VPG (
 	// VGA 640x480 parameter
 	// Horizontal
 	localparam 		h_total 		= 12'd783;
-	localparam 		h_sync		= 12'd90;
-	localparam		h_start  	= 12'd127;
-	localparam 		h_end   		= 12'd767;
+	localparam 		h_sync			= 12'd143;
+	localparam		h_start  		= 12'd143;
+	localparam 		h_end   		= 12'd783;
 	// Vertical
 	localparam 		v_total 		= 12'd509;
-	localparam 		v_sync		= 12'd1;
-	localparam		v_start  	= 12'd8;
-	localparam 		v_end   		= 12'd488;
+	localparam 		v_sync			= 12'd19;
+	localparam		v_start  		= 12'd19;
+	localparam 		v_end   		= 12'd499;
 
 	// Reg/Wire //
-	
 	reg		[11:0]		h_count;
 	reg		[11:0]		v_count;
-	reg						h_act; 
-	reg						v_act;
-	reg						pre_vga_de;
-	wire						h_max, hs_end, hr_start, hr_end;
-	wire						v_max, vs_end, vr_start, vr_end;
+	reg					h_act; 
+	reg					v_act;
+	reg					pre_vga_de;
+	wire				h_max, hs_end, hr_start, hr_end;
+	wire				v_max, vs_end, vr_start, vr_end;
 	
 	// Frame Condition
 	assign h_max 		= h_count == h_total;
@@ -44,24 +43,32 @@ module HDMI_RGB_VPG (
 	assign v_max 		= v_count == v_total;
 	assign vs_end 		= v_count >= v_sync;
 	assign vr_start 	= v_count == v_start; 
-	assign vr_end 		= v_count == v_end;
+	assign vr_end 		= v_count >= v_end;
 	assign pclk 		= clk;
 	
 	// HDMI Start when buffer is filled with 1 pixel CAM_DTA
   	
-	localparam 		WAIT_BUFFER		= 1'b0;
-	localparam 		BUFFER_FULL		= 1'b1;
+	localparam 			WAIT_BUFFER		= 1'b0;
+	localparam 			BUFFER_FULL		= 1'b1;
 	reg 				BUFFER_STATE 	= 1'b0; 
 	reg 				HDMI_START 		= 1'b0;
+	reg      [10:0]		cnt = 11'd0;
 	
 	always @(posedge clk)
 		case (BUFFER_STATE)
-		WAIT_BUFFER: BUFFER_STATE 	<= BUFFER_EN ? BUFFER_FULL : WAIT_BUFFER; 
-		BUFFER_FULL: HDMI_START 	<= 1'b1;
+		WAIT_BUFFER: BUFFER_STATE 	<= HDMI_EN ? BUFFER_FULL : WAIT_BUFFER; 
+		BUFFER_FULL: 
+			begin
+				if (cnt < 11'd1581)	// Delay for 2 lines (1 line = 784 pixels) (base 1581)
+					cnt <= cnt + 11'd1;
+				else
+				begin
+					HDMI_START 	<= 1'b1;
+				end
+			end
 		endcase
 	
 	// Horizontal Control Signals
-	
 	always @(posedge clk) 
 	begin
 		 if (!HDMI_START)
@@ -90,7 +97,6 @@ module HDMI_RGB_VPG (
 	end
 	
 	// Vertical Control Signals
-
 	always @(posedge clk) 
 	begin
 		 if(!HDMI_START)
@@ -108,7 +114,7 @@ module HDMI_RGB_VPG (
 					else
 						v_count <= v_count + 12'b1;
 
-					if (vs_end && !v_max)
+					if (vs_end && !vr_end)
 						 vs <= 1'b1;
 					else
 						 vs <= 1'b0;
@@ -116,67 +122,74 @@ module HDMI_RGB_VPG (
 					if (vr_start)
 						 v_act <= 1'b1;
 					else if (vr_end)
-						 v_act <= 1'b0;
+						v_act <= 1'b0;	 
 			  end
 		 end
 	end
 	
 	// Data Control Signals
 	reg 		[15:0] 		PRE_PIXEL;
-	`define row 		12'd190
-	`define col  		12'd270
+	reg 		[4:0]			GREY_PIXEL;
+	wire R_TH, G_TH;
+	wire [1:0] B_TH;
+	wire TH;
+	// Threshold
+	assign R_TH = (PRE_PIXEL[15:11] > 5'd11) ? 1'b1 : 1'b0;
+	assign G_TH = (PRE_PIXEL[10:5] > 6'd25) ? 1'b1 : 1'b0;
+	assign B_TH[1] = PRE_PIXEL[4] ^ 1'b1;
+	assign B_TH[0] = PRE_PIXEL[3] ^ 1'b1;
+	assign TH = &B_TH || R_TH || G_TH;
 	
-	reg [11:0] width = 12'd300; 
-	reg [11:0] len = 12'd180;
+	localparam RGB = 2'd0;
+	localparam GREY = 2'd1;
+	localparam THRESHOLD = 2'd2;
+	
+	// Select output
+	always @(posedge clk)
+	begin
+		case (SLO)
+		RGB:
+		begin
+			if (pre_vga_de)
+				vga_r <= {PRE_PIXEL[15:11], PRE_PIXEL[15:13]};
+				vga_g <= {PRE_PIXEL[10:5], PRE_PIXEL[10:9]};
+				vga_b <= {PRE_PIXEL[4:0], PRE_PIXEL[4:2]};
+		end
+		GREY:
+		begin
+			if (pre_vga_de)
+				vga_r <= {GREY_PIXEL, 3'b0};
+				vga_g <= {GREY_PIXEL, 3'b0};
+				vga_b <= {GREY_PIXEL, 3'b0};
+		end
+		THRESHOLD:
+		begin
+			if (pre_vga_de)
+				if (TH)
+					{vga_r, vga_g, vga_b} <= 24'h00_00_00;
+				else
+					{vga_r, vga_g, vga_b} <= 24'hFF_FF_FF;
+		end
+		endcase
+	end
+
 	always @(posedge clk)
 	begin
 		if (!HDMI_START)
 		begin 
 			de 			<= 1'b0;
 			pre_vga_de  <= 1'b0;
-			RD_ADDR		<= 13'd0;
 			PRE_PIXEL	<= 16'b0;
 		end
 		else
 		begin
 			de     		<= pre_vga_de;
 			pre_vga_de 	<= v_act && h_act;
-
 			if (pre_vga_de)
 			begin 
-				PRE_PIXEL <= PIXEL;
-				if (RD_ADDR <= 13'd7039)
-					RD_ADDR <= RD_ADDR + 1'b1;
-				else	
-					RD_ADDR <= 13'd0;
+				PRE_PIXEL  <= PIXEL;
+				GREY_PIXEL <= (PIXEL[15:11] + PIXEL[10:6] + PIXEL[4:0]) / 3'd3;
 			end
-			
-			
-			if (de)
-			begin
-				vga_r <= {PRE_PIXEL[15:11], 3'h0};
-				vga_g <= {PRE_PIXEL[10:5], 2'h0};
-				vga_b <= {PRE_PIXEL[4:0], 3'h0};
-			end
-			else 
-				{vga_r, vga_g, vga_b} <= 24'hFF_00_00;
-			
-			
-			//{vga_r, vga_g, vga_b} <= {8'h00, 8'hFF, 8'hFF};
-			
-			/*
-			if (v_count == `row && h_count >= `col && h_count <= `col + width)
-					{vga_r, vga_g, vga_b} <= {8'h00, 8'hFF, 8'hFF};
-			else if (v_count == `row + len && h_count >= `col && h_count <= `col + width)
-					{vga_r, vga_g, vga_b} <= {8'h00, 8'hFF, 8'hFF};
-			else if (h_count == `col && v_count >= `row && v_count <= `row + len)
-					{vga_r, vga_g, vga_b} <= {8'h00, 8'hFF, 8'hFF};
-			else if (h_count == `col + width && v_count >= `row && v_count <= `row + len)
-					{vga_r, vga_g, vga_b} <= {8'h00, 8'hFF, 8'hFF};
-			else
-					{vga_r, vga_g, vga_b} <= {8'h00, 8'h00, 8'h00};
-			*/
 		end
 	end
-	
 endmodule

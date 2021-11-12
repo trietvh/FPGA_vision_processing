@@ -34,7 +34,7 @@ module HDMI_I2C_Config (
 		else
 		begin 
 			if ( I2C_CLK_DIV	< (CLK_ref/I2C_clk))
-				I2C_CLK_DIV		<= I2C_CLK_DIV + 1;
+				I2C_CLK_DIV		<= I2C_CLK_DIV + 8'd1;
 			else
 			begin
 				I2C_CLK_DIV		<= 0;
@@ -84,7 +84,7 @@ module HDMI_I2C_Config (
 						end
 					end
 				2:	begin
-						LUT_INDEX		<= LUT_INDEX + 1;
+						LUT_INDEX		<= LUT_INDEX + 6'd1;
 						Setup_ST			<= 0;
 					end
 				endcase
@@ -103,7 +103,7 @@ module HDMI_I2C_Config (
 	always
 		begin
 			case(LUT_INDEX)
-				0	:	LUT_DATA	<=	16'hFFFF;  //Must be set to 0x03 for proper operation
+				0	:	LUT_DATA	<=	16'h9803;  //Must be set to 0x03 for proper operation
 				1	:	LUT_DATA	<=	16'h0100;  //Set 'N' value at 6144
 				2	:	LUT_DATA	<=	16'h0218;  //Set 'N' value at 6144
 				3	:	LUT_DATA	<=	16'h0300;  //Set 'N' value at 6144

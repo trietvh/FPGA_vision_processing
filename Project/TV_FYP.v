@@ -6,8 +6,6 @@
 module TV_FYP (
 	///////////// CLOCK /////////////
 	input 					CLOCK_50,
-	input 					CLOCK2_50,
-	input						CLOCK3_50,
 	
 	///////////// HDMI //////////////
 	inout              	HDMI_I2C_SCL,
@@ -25,8 +23,8 @@ module TV_FYP (
 	
 	///////////// GPIO //////////////
 	inout  		[35:0]	GPIO_0,
-	inout			[35:0] 	GPIO_1,
 	
+	output		[3:0] 	GPIO_1,
 	///////////// KEY ///////////////
 	input 		[1:0]  	KEY,
 	
@@ -83,8 +81,8 @@ module TV_FYP (
 	HDMI_PLL u_hdmi_pll (
 		.refclk(CLOCK_50),
 		.rst(!KEY[0]),
-		.outclk_0(CAM_XLK),			// 12.5 MHz (640x480 @ 30fps)
-		.outclk_1(i2c_clk),			//    1 MHz 
+		.outclk_0(CAM_XLK),			// 	25 MHz (640x480 @ 60fps)
+		.outclk_1(i2c_clk),			//  1 MHz 
 		.locked(reset_n) 
 	);
 	
@@ -102,12 +100,13 @@ module TV_FYP (
 		.clk(i2c_clk),
 		.reset(reset_n),
 		.I2C_SCL(CAM_SCL),
-		.I2C_SDA(CAM_SDA)
+		.I2C_SDA(CAM_SDA),
+		.finish(LED[6])
 		);	
 		
 	wire		[15:0]		pixel;
-	wire						cam_o_pclk;
-	wire						CAM_EN;
+	wire					cam_o_pclk;
+	wire					CAM_EN;
 	
 	// Camera RGB Data Capture
 	CAM_RGB_Capture u_CAM_RGB_Capture (
@@ -117,34 +116,22 @@ module TV_FYP (
 		.HREF(CAM_HS),
 		.VSYNC(CAM_VS),
 		// Output
+		.HDMI_En(HDMI_EN),
 		.PIXEL(pixel),
 		.o_pclk(cam_o_pclk),
 		.en(CAM_EN)
     );
-	 
-	wire 		[12:0] 		HDMI_ADDR;
-	wire						HDMI_EN;
-	wire 		[15:0]		HDMI_DTA;
-	// Buffer Camera RGB Data
-	RGB_DTA_Buffer u_RGB_DTA_Buffer (
-		// Input
-		.i_clk(cam_o_pclk),
-		.CAM_En(CAM_EN),
-		.CAM_DTA(pixel),
-		.RD_ADDR(HDMI_ADDR),
-		// Output
-		.HDMI_En(HDMI_EN),
-		.HDMI_DTA(HDMI_DTA)
-    );
-
 	
-// HDMI Pattern Generator
+	wire			HDMI_EN;
+	
+	// HDMI Pattern Generator
 	HDMI_RGB_VPG HDMI_u (
+		// Input
         .clk(cam_o_pclk),
-        .BUFFER_EN(HDMI_EN),
-        .PIXEL(HDMI_DTA),
+        .HDMI_EN(HDMI_EN),
+        .PIXEL(pixel),
+		.SLO(SLO),
         // Output
-		  .RD_ADDR(HDMI_ADDR),
         .pclk(HDMI_TX_CLK),
         .hs(HDMI_TX_HS),
         .vs(HDMI_TX_VS),
@@ -153,76 +140,40 @@ module TV_FYP (
         .vga_g(HDMI_TX_D[15:8]),
         .vga_b(HDMI_TX_D[7:0])
     );
+	 
+	reg [18:0] 	counter_1200k;
+	reg 		en_150;
+	reg [1:0] 	SLO = 2'd0;
 	
-	
-	assign GPIO_1[0] = HDMI_TX_HS;
-	assign GPIO_1[1] = HDMI_TX_VS;
-	assign GPIO_1[2] = HDMI_TX_DE;
-	assign GPIO_1[3] = HDMI_TX_CLK;
-
-	
-	
-	
-/*
-	wire o_pclk;
-	reg out_pclk;
-
-	assign o_pclk = out_pclk;
-	always@(negedge CAM_PLK)
-	begin
-		if (!reset_n)   out_pclk <= 1'b0;				
-		else            out_pclk <= ~out_pclk;
-	end
-	
-	HDMI_VPG u_HDMI_VPG (
-		.clk(CAM_PLK),
-		.reset_n(reset_n),
-		.SW(SW[1:0]),
-		.CAM_HR(CAM_HS),
-		.CAM_VS(CAM_VS),
-		.CAM_DTA(CAM_DTA),
-		.de(HDMI_TX_DE),
-		.hr(HDMI_TX_HS),
-		.vr(HDMI_TX_VS),
-		.pclk(HDMI_TX_CLK),
-		.vga_r(HDMI_TX_D[23:16]),
-		.vga_g(HDMI_TX_D[15:8]),
-		.vga_b(HDMI_TX_D[7:0])
-		);
-*/
-/*
-	// Create clock 2 Hz
-	localparam delay = 100000;
-	reg [19:0] counter_1m;
-	reg clk_1hz;
+	 
 	always@(posedge i2c_clk or negedge reset_n)
 	begin
 		if (!reset_n)
 		begin
-			counter_1m <= 20'b0;
-			clk_1hz <= 1'b0;				//frequency divider
+			counter_1200k <= 19'b0;
+			en_150 <= 1'b0;				//frequency divider
 		end
 		else
 		begin
-			if (counter_1m < delay)
-				counter_1m <= counter_1m + 1;
-			else
-			begin
-				counter_1m <= 0;
-				clk_1hz <= ~clk_1hz;
-			end
+			counter_1200k <= counter_1200k + 19'b1;
+			en_150 <= &counter_1200k;
 		end
 	end
 	
-	reg [7:0] camout;
-	
-	always @(posedge clk_1hz or negedge reset_n)
+	always@(posedge en_150)
 	begin
-		if (!reset_n)
-			camout <= 0;
-		else
-			camout <= CAM_DTA;
+		if (!KEY[1])
+			if (SLO == 2'd2)
+				SLO <= 2'd0;
+			else
+				SLO <= SLO + 2'd1;
+		
 	end
-	assign 	LED 	  = camout;
-*/	
+
+	assign LED[1:0] = SLO;
+	assign GPIO_1[0] = HDMI_TX_HS;
+	assign GPIO_1[1] = HDMI_TX_VS;
+	assign GPIO_1[2] = HDMI_TX_DE;
+	assign GPIO_1[3] = HDMI_TX_CLK;
+	
 endmodule
