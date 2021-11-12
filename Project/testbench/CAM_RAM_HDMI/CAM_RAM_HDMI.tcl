@@ -1,11 +1,8 @@
 quit -sim
 vlib work
 
-
-
 vlog ../../Buffer/RAM_DTA_Capture.v
 vlog ../../Buffer/RGB_DTA_Buffer.v
-
 
 vlog ../../Camera/CAM_RGB_Capture.v 
 

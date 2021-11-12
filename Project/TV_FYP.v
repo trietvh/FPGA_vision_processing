@@ -104,15 +104,47 @@ module TV_FYP (
 		.I2C_SCL(CAM_SCL),
 		.I2C_SDA(CAM_SDA)
 		);	
+		
+	wire		[15:0]		pixel;
+	wire						cam_o_pclk;
+	wire						CAM_EN;
+	
+	// Camera RGB Data Capture
+	CAM_RGB_Capture u_CAM_RGB_Capture (
+		// Input
+		.i_pclk(CAM_PLK),
+		.CAM_RGB(CAM_DTA),
+		.HREF(CAM_HS),
+		.VSYNC(CAM_VS),
+		// Output
+		.PIXEL(pixel),
+		.o_pclk(cam_o_pclk),
+		.en(CAM_EN)
+    );
+	 
+	wire 		[12:0] 		HDMI_ADDR;
+	wire						HDMI_EN;
+	wire 		[15:0]		HDMI_DTA;
+	// Buffer Camera RGB Data
+	RGB_DTA_Buffer u_RGB_DTA_Buffer (
+		// Input
+		.i_clk(cam_o_pclk),
+		.CAM_En(CAM_EN),
+		.CAM_DTA(pixel),
+		.RD_ADDR(HDMI_ADDR),
+		// Output
+		.HDMI_En(HDMI_EN),
+		.HDMI_DTA(HDMI_DTA)
+    );
 
 	
-	// HDMI Pattern Generator
+// HDMI Pattern Generator
 	HDMI_RGB_VPG HDMI_u (
-        .clk(CAM_XLK),
-        .reset_n(reset_n),
-        .PIXEL(),
-        .buffer_rd(),
+        .clk(cam_o_pclk),
+        .BUFFER_EN(HDMI_EN),
+        .PIXEL(HDMI_DTA),
         // Output
+		  .RD_ADDR(HDMI_ADDR),
         .pclk(HDMI_TX_CLK),
         .hs(HDMI_TX_HS),
         .vs(HDMI_TX_VS),
@@ -128,6 +160,8 @@ module TV_FYP (
 	assign GPIO_1[2] = HDMI_TX_DE;
 	assign GPIO_1[3] = HDMI_TX_CLK;
 
+	
+	
 	
 /*
 	wire o_pclk;

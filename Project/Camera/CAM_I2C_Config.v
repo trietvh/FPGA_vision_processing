@@ -52,6 +52,9 @@
 		.END(I2C_END)
 		);
 
+	reg [7:0] CNT_DWN;
+	localparam DLY = 200; // Delay 200 I2C Clock cycles (10 ms)
+
 	//	Config Control //
 	always @(posedge I2C_CTRL_CLK or negedge reset)
 	begin 
@@ -67,9 +70,13 @@
 			begin
 				case (Setup_ST)
 				0:	begin
-						I2C_DATA		<= {8'h42,LUT_DATA};
-						I2C_EN		<= 1;
-						Setup_ST		<= 1;
+						if (LUT_DATA == 16'hFFFF)	Setup_ST		<= 3;
+						else
+						begin
+							I2C_DATA		<= {8'h42,LUT_DATA};
+							I2C_EN		<= 1;
+							Setup_ST		<= 1;
+						end
 					end
 				1:	begin
 						if (I2C_END)
@@ -84,6 +91,15 @@
 				2:	begin
 						LUT_INDEX		<= LUT_INDEX + 1;
 						Setup_ST			<= 0;
+					end
+				3:	begin
+						if (CNT_DWN < DLY)
+							CNT_DWN <= CNT_DWN + 1;
+						else 
+						begin
+							CNT_DWN 	<= 0;
+							Setup_ST	<= 2;
+						end
 					end
 				endcase
 			end
@@ -104,6 +120,7 @@
 					 7:  LUT_DATA <= 16'h40_d0; //COM15,     RGB565, full output range
 					 8:  LUT_DATA <= 16'h3a_04; //TSLB       set correct output data sequence (magic)
 					 9:  LUT_DATA <= 16'h14_18; //COM9       MAX AGC value x4
+
 					 10: LUT_DATA <= 16'h4F_B3; //MTX1       all of these are magical matrix coefficients
 					 11: LUT_DATA <= 16'h50_B3; //MTX2
 					 12: LUT_DATA <= 16'h51_00; //MTX3
@@ -111,13 +128,17 @@
 					 14: LUT_DATA <= 16'h53_A7; //MTX5
 					 15: LUT_DATA <= 16'h54_E4; //MTX6
 					 16: LUT_DATA <= 16'h58_9E; //MTXS
+
 					 17: LUT_DATA <= 16'h3D_C0; //COM13      sets gamma enable, does not preserve reserved bits, may be wrong?
+					 
 					 18: LUT_DATA <= 16'h17_14; //HSTART     start high 8 bits
 					 19: LUT_DATA <= 16'h18_02; //HSTOP      stop high 8 bits //these kill the odd colored line
 					 20: LUT_DATA <= 16'h32_80; //HREF       edge offset
+					 
 					 21: LUT_DATA <= 16'h19_03; //VSTART     start high 8 bits
 					 22: LUT_DATA <= 16'h1A_7B; //VSTOP      stop high 8 bits
 					 23: LUT_DATA <= 16'h03_0A; //VREF       vsync edge offset
+
 					 24: LUT_DATA <= 16'h0F_41; //COM6       reset timings
 					 25: LUT_DATA <= 16'h1E_00; //MVFP       disable mirror / flip //might have magic value of 03
 					 26: LUT_DATA <= 16'h33_0B; //CHLF       //magic value from the internet

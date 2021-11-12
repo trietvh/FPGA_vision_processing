@@ -12,3 +12,7 @@ Project/c5_pin_model_dump.txt
 .DS_Store
 
 Project/TV_FYP.qws
+
+Project/testbench/CAM_RAM_HDMI/work/
+
+*.wlf
